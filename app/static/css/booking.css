@@ -1,0 +1,83 @@
+.section{
+    position:relative;
+    height:90vh;
+}
+.section .section-center{
+    position:absolute;
+    top:50%;
+    left:0;
+    right:0;
+    -webkit-transform:translateY(-50%);
+    transform:translateY(-50%);
+}
+#booking{
+    font-family:pt sans,sans-serif;
+    background-image:url(https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669954192/Which_green_and_amber-list_countries_can_we_actually_travel_to__op9cn7.jpg);
+    background-size:cover;
+    background-position:center
+}
+.booking-form{
+    background:rgba(0,0,0,.7);
+    padding:40px;
+    border-radius:6px
+}
+
+.booking-form .form-control{
+    background-color:#fff;
+    height:50px;
+    color:#191a1e;
+    border:none;
+    font-size:16px;
+    font-weight:400;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    border-radius:40px;
+    padding:0 25px
+}
+.booking-form .form-control::-webkit-input-placeholder{
+    color:rgba(82,82,84,.4)
+}
+.booking-form .form-control:-ms-input-placeholder{
+    color:rgba(82,82,84,.4)
+}
+.booking-form .form-control::placeholder{
+    color:rgba(82,82,84,.4)
+}
+.booking-form input[type=date].form-control:invalid{
+    color:rgba(82,82,84,.4)
+}
+
+.booking-form .form-label{
+    display:block;
+    margin-left:20px;
+    margin-bottom:5px;
+    font-weight:400;
+    text-transform:uppercase;
+    line-height:24px;
+    height:24px;
+    font-size:12px;
+    color:#fff}.booking-form .form-checkbox input{
+    position:absolute!important;
+    margin-left:-9999px!important;
+    visibility:hidden!important
+}
+
+.booking-form .form-btn{
+    margin-top:27px;
+}
+.booking-form .submit-btn{
+    color:#fff;
+    background-color:#f23e3e;
+    font-weight:400;
+    height:50px;
+    font-size:14px;
+    border:none;
+    width:100%;
+    border-radius:40px;
+    text-transform:uppercase;
+    -webkit-transition:.2s all;
+    transition:.2s all
+}
+.booking-form .submit-btn:hover,.booking-form .submit-btn:focus{
+    opacity:.8;
+}

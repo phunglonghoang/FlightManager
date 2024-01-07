@@ -1,0 +1,49 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Các chuyến bay{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+<div class="container contact-form" style="width:100%">
+    <div class="contact-image">
+        <img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1670168073/rocket_contact_nfstsp.png" alt="rocket_contact"/>
+    </div>
+    <div style="margin-top: 15%">
+        <h2>Các chuyến bay phù hợp</h2>
+        <table class="table mt-5 text-center">
+            {% if flights %}
+            <tr>
+                <th>Hãng máy bay</th>
+                <th>Thời gian cất cánh</th>
+                <th>Thời gian bay</th>
+                <th></th>
+            </tr>
+            {% for flight in flights %}
+            <tr id="flight{{ flight.id }}">
+                {% for airline in airlines %}
+                {% if airline.id == flight.hangmaybay_ma %}
+                <td>{{ airline.ten }}</td>
+                {% endif %}
+                {% endfor %}
+                <td>{{ flight.giodi.strftime("%H:%M:%S %d/%m/%Y") }}</td>
+                <td>{{ flight.thoigianbay}} phút</td>
+                <td>
+                    <a class="btn btn-danger" href="{{ url_for('flight-details', flight_id=flight.id) }}">Đặt vé</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-danger alert-dismissible d-flex align-items-center fade show container mt-3">
+                <i class="bi-exclamation-octagon-fill"></i>
+                <strong class="mx-2">Error!</strong> Không tìm thấy chuyến bay phù hợp!!!
+            </div>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

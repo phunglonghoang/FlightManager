@@ -1,0 +1,142 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chủ{% endblock %}
+
+
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+      integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
+      integrity="sha512-sMXtMNL1zRzolHYKEujM2AqCLUR9F2C4/05cdbxjjLSRvMQIciEPCQZo++nk7go3BtSuK9kfa/s+a4f4i5pLkw=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.green.min.css"
+      integrity="sha512-C8Movfk6DU/H5PzarG0+Dv9MA9IZzvmQpO/3cIlGIflmtY3vIud07myMu4M/NTPJl8jmZtt/4mC9bAioMZBBdA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+{% endblock %}
+
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+{% endblock %}
+
+{% block content %}
+<div id="demo" class="carousel slide" data-bs-ride="carousel">
+
+    <!-- Indicators/dots -->
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+    </div>
+
+    <!-- The slideshow/carousel -->
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669909156/trademark-1_fft5du.jpg"
+                 alt="Los Angeles" class="d-block" style="width:100%">
+            <div class="carousel-caption">
+                <h3>Nha Trang</h3>
+                <p>Nha Trang thật tuyệt vời!</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669909154/trademark-2_hrutdc.jpg"
+                 alt="Chicago" class="d-block" style="width:100%">
+            <div class="carousel-caption">
+                <h3>Vũng Tàu</h3>
+                <p>Cảm ơn, Vũng Tàu!</p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669909154/trademark-3_jm4wu5.jpg"
+                 alt="New York" class="d-block" style="width:100%">
+            <div class="carousel-caption">
+                <h3>Vịnh Hạ Long</h3>
+                <p>Chúng tôi yêu Vịnh Hạ Long!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Left and right controls/icons -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<div>
+    <div class="text-center content">
+        <h2 class="h1-responsive font-weight-bold text-center my-4">Tìm kiếm chuyến bay</h2>
+        <p class="text-center w-responsive mx-auto mb-3">Bạn đang tìm vé máy bay tốt nhất đến Việt Nam? Tại đây có vé máy bay một chiều và khứ hồi
+            với giá vé thấp
+            nhất.</p>
+    </div>
+    {% block booking %}
+    {% include 'layout/booking.html' %}
+    {% endblock %}
+</div>
+
+<div class="container mg-section">
+    <div class="text-center content">
+        <h2 class="h1-responsive font-weight-bold text-center my-4">Nói về chúng tôi</h2>
+        <p class="text-center w-responsive mx-auto mb-3">Chúng tôi và các đối tác luôn không ngừng nỗ lực hoàn thiện và phát triển sự chuyên môn hoá bằng những cải
+            tiến không ngừng nhằm mang đến cho du khách những trải nghiệm đẹp và giữ vững vị trí hàng đầu trong các lĩnh
+            vực hoạt động.</p>
+    </div>
+    <div class="owl-carousel owl-theme service">
+        {% for airline in airlines %}
+        <div class="item">
+            <img src={{airline.hinhanh}} alt="{{airline.ten}}" class="item__img"/>
+            <div class="item__overlay item__overlay-color">
+                <a class="item__overlay-title">{{airline.ten}}</a>
+                <div class="item__overlay-desc">{{airline.gioithieu}}</div>
+                <a class="item__overlay-btn" href="{{ url_for('airline', airline_id=airline.id)}}">Đặt vé ngay &#10145;</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"
+            integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ url_for('static', filename='js/slideshow.js') }}"></script>
+
+</div>
+
+<div class="container mg-section">
+    <div class="text-center content">
+        <h2 class="h1-responsive font-weight-bold text-center my-4">Dịch vụ tối ưu</h2>
+        <p class="text-center w-responsive mx-auto mb-3">Chúng tôi luôn cố gắng để đem đến cho bạn các dịch vụ tốt nhất</p>
+    </div>
+    <div class="row text-center">
+        <div class="col-sm d-flex justify-content-center">
+            <div class="img"><img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1670079765/icon-lights_stg33m.svg"></div>
+            <div class="ms-4">
+                <h5 class="fw-bolder">Tiết kiệm</h5>
+                <p class="fst-italic">Dễ dàng so sánh giá<br>Tiết kiệm thời gian</p>
+            </div>
+        </div>
+        <div class="col-sm d-flex justify-content-center">
+            <div class="img"><img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1670079767/icon-clock_ym6g9i.svg"></div>
+            <div class="ms-4">
+                <h5 class="fw-bolder">Tiết kiệm</h5>
+                <p class="fst-italic">Dễ dàng so sánh giá<br>Tiết kiệm thời gian</p>
+            </div>
+        </div>
+        <div class="col-sm d-flex justify-content-center">
+            <div class="img"><img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1670079765/icon-like_rjgycv.svg"></div>
+            <div class="ms-4">
+                <h5 class="fw-bolder">Tin cậy</h5>
+                <p class="fst-italic">Thanh toán an toàn<br>Đảm bảo tin cậy</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Vé theo hãng{% endblock %}
+
+
+{% block content %}
+
+{% if b %}
+<div>
+    <div class="text-center content">
+        <h2 class="h1-responsive font-weight-bold text-center my-4">{{b.ten}}</h2>
+    </div>
+    {% block booking %}
+    {% include 'layout/booking.html' %}
+    {% endblock %}
+</div>
+{% else %}
+<div class="alert alert-danger alert-dismissible d-flex align-items-center fade show container mt-3">
+    <i class="bi-exclamation-octagon-fill"></i>
+    <strong class="mx-2">Error!</strong> Không tìm thấy hãng máy bay phù hợp!!!
+</div>
+{% endif %}
+{% endblock %}

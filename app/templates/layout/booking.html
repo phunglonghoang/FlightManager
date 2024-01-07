@@ -1,0 +1,67 @@
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}"/>
+{% endblock %}
+
+<div id="booking" class="section">
+    <div class="section-center">
+        <div class="container">
+            <div class="row">
+                <div class="booking-form">
+                    <form action="{{ url_for('flights')}}">
+                        {% if b %}
+                        <div class="row justify-content-center d-none">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <input class="form-control text-center" type="text" id="airline" name="airline"
+                                           value="{{b.id}}"/>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <span class="form-label">Điểm đi</span>
+                                    <input class="form-control" type="text" id="airport1" name="airport1"
+                                           list="datalistOptions" placeholder="Nhập sân bay đi" required=""/>
+                                    <datalist  id="datalistOptions">
+                                        {% for airport in airports%}
+                                        <option value="{{ airport.ten }}">
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <span class="form-label">Ngày đi</span>
+                                    <input class="form-control" type="date" id="datetime"
+                                           name="departuretime" required=""/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <span class="form-label">Điểm đến</span>
+                                    <input class="form-control" type="text" id="airport2" name="airport2"
+                                           list="datalistOptions2" placeholder="Nhập sân bay đến" required=""/>
+                                    <datalist  id="datalistOptions2">
+                                        {% for airport in airports%}
+                                        <option value="{{ airport.ten }}">
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-btn">
+                                    <input type="submit" value="Tìm" class="submit-btn"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
