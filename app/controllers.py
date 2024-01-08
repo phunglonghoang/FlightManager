@@ -8,7 +8,8 @@ from datetime import timedelta, datetime
 def index():
     airlines = dao.load_airlines()
     airports = dao.load_sanbays()
-    return render_template('index.html', airlines=airlines, airports=airports)
+    hangves = dao.load_hangves()
+    return render_template('index.html', airlines=airlines, airports=airports, hangves=hangves)
 
 
 def airline():

@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 app.secret_key = '$#&*&%$(*&^(*^*&%^%$#^%&^%*&56547648764%$#^%$&12312^'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/baitaplon?charset=utf8mb4' % quote(
-    '17Hoang08@')
+    'PassW0rk#123Wen')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app=app)

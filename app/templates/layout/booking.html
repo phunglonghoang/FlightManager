@@ -1,5 +1,11 @@
 {% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+<style>
+    /* Thêm đoạn CSS để chuyển màu chữ sang trắng */
+    body {
+        color: white;
+    }
+</style>
 {% endblock %}
 
 <div id="booking" class="section">
@@ -13,47 +19,91 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <input class="form-control text-center" type="text" id="airline" name="airline"
-                                           value="{{b.id}}"/>
+                                           value="{{b.id}}">
                                 </div>
                             </div>
                         </div>
                         {% endif %}
+
                         <div class="row justify-content-center">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <span class="form-label">Điểm đi</span>
                                     <input class="form-control" type="text" id="airport1" name="airport1"
                                            list="datalistOptions" placeholder="Nhập sân bay đi" required=""/>
-                                    <datalist  id="datalistOptions">
-                                        {% for airport in airports%}
+                                    <datalist id="datalistOptions">
+                                        {% for airport in airports %}
                                         <option value="{{ airport.ten }}">
-                                        {% endfor %}
+                                            {% endfor %}
                                     </datalist>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+
+                            <div class="col-md-1 align-self-center">
+                                <button type="button" id="swapAirports" class="btn btn-primary btn-block">
+                                    <i class="fas fa-arrow-right-arrow-left"></i>
+                                </button>
+                            </div>
+
+                            <div class="col-md-5">
                                 <div class="form-group">
-                                    <span class="form-label">Ngày đi</span>
-                                    <input class="form-control" type="date" id="datetime"
-                                           name="departuretime" required=""/>
+                                    <span class="form-label">Điểm đến</span>
+                                    <input class="form-control" type="text" id="airport2" name="airport2"
+                                           list="datalistOptions2" placeholder="Nhập sân bay đến" required=""/>
+                                    <datalist id="datalistOptions2">
+                                        {% for airport in airports %}
+                                        <option value="{{ airport.ten }}">
+                                            {% endfor %}
+                                    </datalist>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row justify-content-center">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <span class="form-label">Điểm đến</span>
-                                    <input class="form-control" type="text" id="airport2" name="airport2"
-                                           list="datalistOptions2" placeholder="Nhập sân bay đến" required=""/>
-                                    <datalist  id="datalistOptions2">
-                                        {% for airport in airports%}
-                                        <option value="{{ airport.ten }}">
-                                        {% endfor %}
-                                    </datalist>
+                                    <span class="form-label">Ngày đi</span>
+                                    <input class="form-control" type="date" id="datetime" name="departuretime"
+                                           required=""/>
                                 </div>
                             </div>
+
                             <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" id="roundTripCheckbox" class="form-check-input">
+                                        Khứ hồi
+                                    </label>
+                                    <input class="form-control"
+                                           type="date"
+                                           id="returnDatetime"
+                                           name="returnDatetime" disabled/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="numberOfPeople">Số lượng người đi</label>
+                                    <div class="input-group">
+                                        <input class="form-control" type="number" id="numberOfPeople"
+                                               name="numberOfPeople" min="1" value="1" required/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="ticketClass">Hạng vé</label>
+                                    <select class="form-control" id="ticketClass" name="ticketClass">
+                                        {% for hangve in hangves %}
+                                        <option value="{{ hangve.id }}">{{ hangve.ten }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-2">
                                 <div class="form-btn">
                                     <input type="submit" value="Tìm" class="submit-btn"/>
                                 </div>
@@ -65,3 +115,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Add JavaScript to swap airport values when the button is clicked
+    var swapAirportsButton = document.getElementById('swapAirports');
+    var airport1Input = document.getElementById('airport1');
+    var airport2Input = document.getElementById('airport2');
+
+    swapAirportsButton.addEventListener('click', function () {
+        var temp = airport1Input.value;
+        airport1Input.value = airport2Input.value;
+        airport2Input.value = temp;
+    });
+
+    // Add JavaScript to show/hide the return date field based on the checkbox state
+    var roundTripCheckbox = document.getElementById('roundTripCheckbox');
+    var returnDateField = document.getElementById('returnDateField');
+    var returnDatetime = document.getElementById('returnDatetime');
+
+    roundTripCheckbox.addEventListener('change', function () {
+        returnDatetime.disabled = !roundTripCheckbox.checked;
+    });
+
+    // Add JavaScript for selecting the number of people
+    var quantityInput = document.getElementById('numberOfPeople');
+    var selectQuantityButton = document.getElementById('selectQuantity');
+
+    selectQuantityButton.addEventListener('click', function () {
+        $('#passengerModal').modal('show');
+    });
+</script>

@@ -86,6 +86,7 @@ def load_bangdongias(f=None):
 
 
 def load_hangves():
+
     return HangVe.query.all()
 
 
