@@ -93,6 +93,7 @@ class ChuyenBayModelView(Authenticated2ModelView):
     page_size = 10
 
 
+
 class SanBayDungModelView(AuthenticatedModelView):
     column_filters = ['chuyenbay_ma']
     can_view_details = True
@@ -117,7 +118,6 @@ class ChiTietChuyenBayModelView(AuthenticatedModelView):
 
     }
     page_size = 10
-
 
 class HangVeModelView(AuthenticatedModelView):
     can_export = True
