@@ -85,7 +85,8 @@ class NguoiDung(BaseModel, UserMixin):
     passport = Column(String(20), nullable=False)
     hoatdong = Column(Boolean, default=True)
     loainguoidung = Column(Enum(UserRole), default=UserRole.USER)
-    anhdaidien = Column(String(100), nullable=False)
+    anhdaidien = Column(String(100), nullable=True)
+    ves = relationship('VeChuyenBay',backref = 'NguoiDung', lazy = True)
 
     def __str__(self):
         return str(self.ten)
@@ -109,66 +110,43 @@ class BangDonGia(BaseModel):
     gia = Column('giatien', Float, default=0)
     vechuyenbays = relationship('VeChuyenBay', backref='bangdongia', lazy=True)
     soghe = Column(Integer, nullable=False)
-
+    def __str__(self):
+        return str(self.gia)
 
 class VeChuyenBay(BaseModel):
     __tablename__ = 'vechuyenbay'
-
     tennguoidi = Column(String(50), nullable=False)
     cccd = Column(String(20), nullable=False)
     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
     bangdongia_ma = Column(Integer, ForeignKey(BangDonGia.id), nullable=False)
     Ngaydat = Column(DateTime, default=datetime.now())
 
-# class HoaDon(BaseModel):
-#     __tablename__ = 'hoadon'
-#
-#     ngayxuat = Column(DateTime, default=datetime.now(), nullable=False)
-#     tongtien = Column(Float, nullable=False)
-#     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
-#     vechuyenbay_ma = Column(Integer, ForeignKey(VeChuyenBay.id), nullable=False)
-#     nguoidung = relationship("NguoiDung", backref="hoadons")
-#     vechuyenbay = relationship("VeChuyenBay", backref="hoadons")
-#
-#     def __str__(self):
-#         return f"HoaDon {self.id}"
-#
-#
-# class History(BaseModel):
-#     __tablename__ = 'history'
-#
-#     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
-#     chuyenbay_ma = Column(Integer, ForeignKey(ChuyenBay.id), nullable=False)
-#     ngaydat = Column(DateTime, default=datetime.now(), nullable=False)
-#     nguoidung = relationship("NguoiDung", backref="histories")
-#     chuyenbay = relationship("ChuyenBay", backref="histories")
-#
-#     def __str__(self):
-#         return f"History {self.id} - User {self.nguoidung_ma}"
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
+        #
         # v1 = HangVe(ten='Hạng 1')
         # v2 = HangVe(ten='Hạng 2')
         # db.session.add_all([v1, v2])
         # db.session.commit()
-
+        #
         # import hashlib
         #
         # password = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
-        # u1 = NguoiDung(ten='Hoang', taikhoan='admin', matkhau=password,phone='123456', cccd='392139213',passport='222', loainguoidung=UserRole.ADMIN,)
+        # u1 = NguoiDung(ten='Hoang', taikhoan='admin', matkhau=password,phone='123456', cccd='392139213',
+        #                passport='222', loainguoidung=UserRole.ADMIN,anhdaidien='https://res.cloudinary.com/dtcjtwznh/image/upload/v1704739630/prgmmgu4q9xnyvbmuod9.png')
         # u2 = NguoiDung(ten='Hoang', taikhoan='staff', matkhau=password, phone='123456', cccd='321321321',
-        #                passport='222', loainguoidung=UserRole.STAFF, )
+        #                passport='222', loainguoidung=UserRole.STAFF, anhdaidien='https://res.cloudinary.com/dtcjtwznh/image/upload/v1704739630/prgmmgu4q9xnyvbmuod9.png')
         #
         # u3 = NguoiDung(ten='ND1', taikhoan='user1', matkhau=password, phone='123256', cccd='3213212321',
-        #                passport='22221', loainguoidung=UserRole.USER, )
+        #                passport='22221', loainguoidung=UserRole.USER, anhdaidien='https://res.cloudinary.com/dtcjtwznh/image/upload/v1704739630/prgmmgu4q9xnyvbmuod9.png')
         # db.session.add_all([u1, u2, u3])
         # db.session.commit()
 
         #
-        # # Hang may bay
+        # Hang may bay
         #
         # c1 = HangMayBay(ma_hang='HVN',ten='Vietnam Airlines',
         #                 gioithieu="Là một Hãng hàng không quốc gia có quy mô hoạt động toàn cầu và có tầm cỡ tại khu vực.Vietnam Airlines cam kết sẽ luôn đồng hành cùng các cổ đông, minh bạch công khai thông tin, duy trì và nâng cao các kênh đối thoại mở với cổ đông, tổ chức hoạt động kinh doanh an toàn, chất lượng và có hiệu quả trên cơ sở cân đối hài hòa lợi ích của cổ đông với việc đáp ứng nhu cầu phát triển kinh tế của đất nước.",
@@ -209,16 +187,16 @@ if __name__ == '__main__':
         # #
         # db.session.add_all([t1, t2, t3])
         # db.session.commit()
-        # #chuyến bay
+        #chuyến bay
         # cb1 = ChuyenBay(ten_cb ="BMT- ĐN", giodi=datetime.strptime('01/10/24 02:55:00', '%m/%d/%y %H:%M:%S'), thoigianbay=90,
         #                hangmaybay_ma=1, tuyenbay_ma=1)
         # db.session.add_all([cb1])
         # db.session.commit()
-        # #
         #
+
         #
-        b1 = BangDonGia(hangve_ma=1, chuyenbay_ma=1, gia=1000000, soghe=20)
-        b2 = BangDonGia(hangve_ma=2, chuyenbay_ma=1, gia=900000, soghe=15)
+        # b1 = BangDonGia(hangve_ma=1, chuyenbay_ma=1, gia=1000000, soghe=20)
+        # b2 = BangDonGia(hangve_ma=2, chuyenbay_ma=1, gia=900000, soghe=15)
         # b3 = BangDonGia(hangve_ma=1, chuyenbay_ma=2, gia=800000, soghe=50)
         # b4 = BangDonGia(hangve_ma=1, chuyenbay_ma=3, gia=1300000, soghe=30)
         # b5 = BangDonGia(hangve_ma=2, chuyenbay_ma=3, gia=1000000, soghe=20)

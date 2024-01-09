@@ -6,7 +6,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask_admin import BaseView, expose, Admin, AdminIndexView
 from flask_login import logout_user, current_user
 from wtforms import ValidationError
-
+from wtforms.fields import PasswordField
 
 
 
@@ -43,11 +43,11 @@ class LogoutView(Authenticated2View):
         return redirect('/admin')
 
 
-# class StatsView(AuthenticatedView):
-#     @expose('/')
-#     def index(self):
-#         stats = dao.flightroute_stats(from_date=request.args.get('from_date'), to_date=request.args.get('to_date'))
-#         return self.render('admin/stats.html', stats=stats)
+class StatsView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        stats = dao.flightroute_stats(from_date=request.args.get('from_date'), to_date=request.args.get('to_date'))
+        return self.render('admin/stats.html', stats=stats)
 
 
 class HangMayBayModelView(AuthenticatedModelView):
@@ -57,11 +57,13 @@ class HangMayBayModelView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
     column_labels = {
+        'ma_hang': 'Mã hãng bay',
         'ten': 'Tên hãng máy bay',
         'gioithieu': 'Giới thiệu',
         'hinhanh': 'Hình ảnh'
     }
     page_size = 10
+    form_columns =('ma_hang','ten','gioithieu','hinhanh')
 
 
 class SanBayModelView(AuthenticatedModelView):
@@ -71,8 +73,12 @@ class SanBayModelView(AuthenticatedModelView):
     can_export = True
     column_labels = {
         'ten': 'Tên sân bay',
+
+        'masanbay': 'Mã Sân Bay',
+        'vitri': 'Vị Trí'
     }
     page_size = 10
+    form_columns = ('ten', 'masanbay', 'vitri')
 
 
 class TuyenBayModelView(AuthenticatedModelView):
@@ -81,20 +87,19 @@ class TuyenBayModelView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
     column_labels = {
-        'chuyenbays': 'Chuyến bay',
+
         'ten': 'Tên tuyến bay',
         'sanbaydi': 'Sân bay đi',
         'sanbayden': 'Sân bay đến',
     }
     page_size = 10
-
+    form_columns = ('ten', 'sanbaydi', 'sanbayden')
     #hàm kiểm tra thay đổi trong form và gọi hàm check_same_airport
     def on_model_change(self, form, model, is_created):
 
         self.check_same_airport(model.sanbaydi, model.sanbayden)
     #hàm check trùng sân bay
     def check_same_airport(self, sanbaydi, sanbayden):
-
         if sanbaydi == sanbayden:
             raise ValidationError('trùng sân bay vui lòng chọn lại')
 
@@ -105,14 +110,15 @@ class ChuyenBayModelView(Authenticated2ModelView):
     can_view_details = True
     can_export = True
     column_labels = {
+        'ten_cb': 'Tên chuyến bay',
         'giodi': 'Giờ đi',
         'thoigianbay': 'Thời gian bay',
         'hangmaybay': 'Hãng máy bay',
         'tuyenbay': 'Tuyến bay',
-        'bangdongias': "đơn giá"
+
     }
     page_size = 10
-    form_columns = ('giodi', 'thoigianbay', 'hangmaybay', 'tuyenbay','bangdongias')
+    form_columns = ('ten_cb','giodi', 'thoigianbay', 'hangmaybay', 'tuyenbay')
     def on_model_change(self, form, model, is_created):
         if model.thoigianbay < 30:
             raise ValidationError('Thời gian bay tối thiểu là 30 phút')
@@ -162,7 +168,10 @@ class HangVeModelView(AuthenticatedModelView):
     column_labels = {
         'ten': 'Tên hạng vé'
     }
+
     page_size = 10
+    form_columns = ['ten']
+
 
 
 class NguoiDungModelView(AuthenticatedModelView):
@@ -181,19 +190,46 @@ class NguoiDungModelView(AuthenticatedModelView):
         'loainguoidung': 'Loại người dùng',
     }
     page_size = 10
+    # column_list = ['nguoidung_ma']
+    # dấu kí tự password
+    form_overrides = {
+        'matkhau': PasswordField
+    }
+    form_excluded_columns = ['ves']
+    # column_list = ('tennguoidi', 'nguoidung_ma')
+    #kiểm tra hàm nhập phone xem đã có trong db chưa
+    def on_model_change(self, form, model):
+
+        phone_form = form.phone.data
+        cccd_form = form.cccd.data
+        passport_form = form.passport.data
 
 
-class VeChuyenBayModelView(AuthenticatedModelView):
+        if NguoiDung.query.filter_by(phone=phone_form).first():
+            raise ValidationError('SĐT đã được đăng kí trước đó')
+
+        if NguoiDung.query.filter_by(cccd=cccd_form).first():
+            raise ValidationError('Số CCCD đã được đăng kí trước đó')
+        if NguoiDung.query.filter_by(passport= passport_form).first():
+            raise ValidationError('Passport đã được  đăng kí trước đó')
+
+        return super(NguoiDungModelView, self).on_model_change(form, model)
+
+class VeChuyenBayModelView(Authenticated2ModelView):
     can_export = True
     can_view_details = True
     column_labels = {
         'tennguoidi': 'Tên người đi',
         'cccd': 'Căn cước công dân',
         'Ngaydat': 'Ngày đặt vé',
-        'nguoidung': 'Người dùng',
-        'bangdongia': 'Chi tiết chuyến đi',
+        'nguoidung_ma': 'Mã Người dùng',
+        'bangdongia': 'Gia'
     }
+
     page_size = 10
+
+
+
 
 
 admin.add_view(HangMayBayModelView(HangMayBay, db.session, name='Hãng máy bay'))
@@ -205,7 +241,7 @@ admin.add_view(ChiTietChuyenBayModelView(BangDonGia, db.session, name='Chi tiế
 admin.add_view(HangVeModelView(HangVe, db.session, name='Hạng vé'))
 admin.add_view(NguoiDungModelView(NguoiDung, db.session, name='Người dùng'))
 admin.add_view(VeChuyenBayModelView(VeChuyenBay, db.session, name='Vé'))
-# admin.add_view(StatsView(name='BC-TK'))
+admin.add_view(StatsView(name='BC-TK'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
 
