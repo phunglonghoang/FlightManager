@@ -31,12 +31,14 @@ def flight():
             date = request.args.get("departuretime")
             dt = datetime.strptime(date, "%Y-%m-%d") + timedelta(hours=12)
             flights = dao.load_flights(a, al, dt)
+
+            print([row._asdict() for row in flights])
+
             return render_template('flights.html', airlines=airlines, a=a, flights=flights)
         else:
             return render_template('flights.html', airlines=airlines, flights=None)
     else:
         return render_template('flights.html', airlines=airlines, flights=None)
-
 
 def flight_details():
     airlines = dao.load_airlines()
@@ -49,8 +51,21 @@ def flight_details():
     hvs = dao.load_hangves()
     sbds = dao.load_sanbaydungs()
     sbs = dao.load_sanbays()
+    price = request.args.get("price")
+    total_price = 0
+    if price is not None and isinstance(price, (int, float)):
+        number_of_people = request.args.get('numberOfPeople', 1, type=int)
+        total_price = abs(float(price) * number_of_people)
     return render_template('flight-details.html', airlines=airlines, fl=fl, a1=a1, a2=a2, bdgs=bdgs, hvs=hvs,
-                           sbds=sbds, sbs=sbs)
+                           sbds=sbds, sbs=sbs, price=price, total_price=total_price)
+
+
+# def process_payment():
+#     bangdongia = request.form.get("bangdongia")
+#     tenhanhkhach = request.form.get("tenhanhkhach")
+#     cccd = request.form.get("cccd")
+#     dao.add_ticket(tenhanhkhach, cccd, bangdongia)
+#     return redirect('/')
 
 
 def contact():
@@ -78,9 +93,7 @@ def register():
 
         if password.__eq__(confirm):
             avatar = ''
-            # if request.files:
-            #     res = cloudinary.uploader.upload(request.files['avatar'])
-            #     avatar = res['secure_url']
+
             try:
                 dao.register(name=request.form['name'],
                              username=request.form['username'],
@@ -98,6 +111,7 @@ def register():
 
 
 def login_my_user():
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -107,12 +121,19 @@ def login_my_user():
             login_user(user)
 
             u = request.args.get('next')
-            return redirect(u if u else '/')
+            price = request.args.get("price")
+            quantity = request.args.get("numberOfPeople")
+
+            if u:
+                redirect_url = f'{u}&price={price}&numberOfPeople={quantity}'
+                return redirect(redirect_url)
+            return redirect('/')
 
     return render_template('login.html')
 
 
 def logout_my_user():
+    print("haha")
     logout_user()
     return redirect('/')
 

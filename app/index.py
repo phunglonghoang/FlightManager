@@ -24,6 +24,8 @@ app.add_url_rule('/logout', 'logout', controllers.logout_my_user)
 
 app.add_url_rule('/pay', 'pay', controllers.pay)
 
+# app.add_url_rule('/process-payment', 'process_payment', process_payment, methods=['POST'])
+
 
 @login.user_loader
 def load_user(user_id):

@@ -34,7 +34,7 @@
                                     <datalist id="datalistOptions">
                                         {% for airport in airports %}
                                         <option value="{{ airport.ten }}">
-                                            {% endfor %}
+                                        {% endfor %}
                                     </datalist>
                                 </div>
                             </div>
@@ -53,7 +53,7 @@
                                     <datalist id="datalistOptions2">
                                         {% for airport in airports %}
                                         <option value="{{ airport.ten }}">
-                                            {% endfor %}
+                                        {% endfor %}
                                     </datalist>
                                 </div>
                             </div>
@@ -77,31 +77,19 @@
                                     <input class="form-control"
                                            type="date"
                                            id="returnDatetime"
-                                           name="returnDatetime" disabled/>
+                                           name="returnDatetime" disabled required />
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="numberOfPeople">Số lượng người đi</label>
-                                    <div class="input-group">
-                                        <input class="form-control" type="number" id="numberOfPeople"
-                                               name="numberOfPeople" min="1" value="1" required/>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <label for="ticketClass">Hạng vé</label>
-                                    <select class="form-control" id="ticketClass" name="ticketClass">
-                                        {% for hangve in hangves %}
-                                        <option value="{{ hangve.id }}">{{ hangve.ten }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="numberOfPeople">Số lượng người đi</label>-->
+<!--                                    <div class="input-group">-->
+<!--                                        <input class="form-control" type="number" id="numberOfPeople"-->
+<!--                                               name="numberOfPeople" min="1" value="{{ request.args.get('numberOfPeople') | default(1) }}" required/>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
                             <div class="col-md-2">
                                 <div class="form-btn">
@@ -109,6 +97,9 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Thêm hidden field để chứa numberOfPeople -->
+                        <input type="hidden" name="numberOfPeople" value="{{ request.args.get('numberOfPeople') | default(1) }}">
                     </form>
                 </div>
             </div>
@@ -130,18 +121,9 @@
 
     // Add JavaScript to show/hide the return date field based on the checkbox state
     var roundTripCheckbox = document.getElementById('roundTripCheckbox');
-    var returnDateField = document.getElementById('returnDateField');
     var returnDatetime = document.getElementById('returnDatetime');
 
     roundTripCheckbox.addEventListener('change', function () {
         returnDatetime.disabled = !roundTripCheckbox.checked;
-    });
-
-    // Add JavaScript for selecting the number of people
-    var quantityInput = document.getElementById('numberOfPeople');
-    var selectQuantityButton = document.getElementById('selectQuantity');
-
-    selectQuantityButton.addEventListener('click', function () {
-        $('#passengerModal').modal('show');
     });
 </script>

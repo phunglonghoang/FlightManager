@@ -6,16 +6,35 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}"/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}"/>
 {% endblock %}
+
 {% block js %}
 <script src="{{ url_for('static', filename='js/pay.js') }}"></script>
 {% endblock %}
-{% block content %}
 
+{% set numberOfPeople = request.args.get('numberOfPeople') %}
+{% if numberOfPeople is not none %}
+    {% if numberOfPeople.isdigit() %}
+        {% set numberOfPeople = numberOfPeople | int %}
+    {% else %}
+        {% set numberOfPeople = 1 %}
+    {% endif %}
+{% else %}
+    {% set numberOfPeople = 1 %}
+{% endif %}
+
+
+{% block content %}
 <div class="container contact-form" style="width:100%">
     <div class="contact-image">
         <img src="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1670168073/rocket_contact_nfstsp.png"
              alt="rocket_contact"/>
     </div>
+    <!--    <div>-->
+    <!--        Số người từ request.args: {{ request.args.get('numberOfPeople') }}-->
+    <!--    </div>-->
+    <!--    <div>Price Number: {{ price_number }}</div>-->
+    <!--    <div>Number of People (int): {{ number_of_people }}</div>-->
+    <!--    <div>Giá vé: {{ price }}</div>-->
     <div style="margin-top: 15%">
         <h2>Đặt chuyến bay</h2>
         {% if fl %}
@@ -23,41 +42,57 @@
             <table class="tableStyle">
                 <tr>
                     <td class="col-md-5">Mã chuyến bay</td>
-                    <td class="col-md-7">{{fl.id}}</td>
+                    <td class="col-md-7">{{ fl.id }}</td>
                 </tr>
                 <tr>
                     <td class="col-md-5">Hãng máy bay</td>
-                    {% for airline in airlines %}
-                    {% if airline.id == fl.hangmaybay_ma %}
-                    <td class="col-md-7">{{ airline.ten }}</td>
-                    {% endif %}
-                    {% endfor %}
-                </tr>
-                <tr>
-                    <td class="col-md-5">Thời gian bay</td>
-                    <td class="col-md-7">{{fl.thoigianbay}} phút</td>
-                </tr>
-                <tr>
-                    <td class="col-md-5">Thời gian cất cánh</td>
-                    <td class="col-md-7">{{fl.giodi.strftime("%H:%M:%S %d/%m/%Y")}}</td>
-                </tr>
-                <tr>
-                    <td class="col-md-5">Tuyến bay</td>
-                    <td class="col-md-7">{{a1.ten}} &#10145 {{a2.ten}}</td>
-                </tr>
-                <tr>
-                    <td class="col-md-5">Giá vé</td>
                     <td class="col-md-7">
-                        {% for bdg in bdgs %}
-                        {% for hv in hvs %}
-                        {% if bdg.hangve_ma == hv.id %}
-                        <input type="radio" id="{{bdg.id}}" name="bangdongia" value="{{bdg.id}}" checked>
-                        <label for="{{bdg.id}}">{{hv.ten}}: {{ "{:,.1f}".format(bdg.gia)}}VNĐ</label><br>
+                        {% for airline in airlines %}
+                        {% if airline.id == fl.hangmaybay_ma %}
+                        {{ airline.ten }}
                         {% endif %}
-                        {% endfor %}
                         {% endfor %}
                     </td>
                 </tr>
+                <tr>
+                    <td class="col-md-5">Thời gian bay</td>
+                    <td class="col-md-7">{{ fl.thoigianbay }} phút</td>
+                </tr>
+                <tr>
+                    <td class="col-md-5">Thời gian cất cánh</td>
+                    <td class="col-md-7">{{ fl.giodi.strftime("%H:%M:%S %d/%m/%Y") }}</td>
+                </tr>
+                <tr>
+                    <td class="col-md-5">Tuyến bay</td>
+                    <td class="col-md-7">{{ a1.ten }} &#10145; {{ a2.ten }}</td>
+                </tr>
+                <tr>
+                    <td class="col-md-5">Giá vé</td>
+                    <td class="col-md-7">{{ price | float }} VNĐ</td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-5">Số người</td>
+                    <td>{{ request.args.get('numberOfPeople') | default(1) }}</td>
+                </tr>
+
+                <!-- Thêm vòng lặp cho thông tin hành khách -->
+
+                <tr>
+                    <td class="col-md-5">Tổng tiền</td>
+                    <td class="col-md-7">
+                        {% if price is defined and price is number and numberOfPeople is defined and numberOfPeople is
+                        number and numberOfPeople > 0 %}
+                        {% set price_number = price | float %}
+                        {% set number_of_people = numberOfPeople | int %}
+                        {% set total_price = number_of_people * price_number %}
+                        {{ number_of_people }} người x {{ price_number }} VNĐ/người = {{ total_price }} VNĐ
+                        {% else %}
+                        Số lượng hành khách không hợp lệ
+                        {% endif %}
+                    </td>
+                </tr>
+
                 <tr>
                     <td class="col-md-5">Thời gian dừng</td>
                     <td class="col-md-7">
@@ -66,7 +101,7 @@
                             {% if sbd.chuyenbay_ma == fl.id %}
                             {% for sb in sbs %}
                             {% if sb.id == sbd.sanbay_ma %}
-                            <li>{{sb.ten}}: {{sbd.thoigiandung}} phút</li>
+                            <li>{{ sb.ten }}: {{ sbd.thoigiandung }} phút</li>
                             {% endif %}
                             {% endfor %}
                             {% endif %}
@@ -74,21 +109,38 @@
                         </ol>
                     </td>
                 </tr>
+
+
             </table>
+
             {% if current_user.is_authenticated %}
             <div class="form-floating mb-3 mt-3 col-md-8" style="margin:auto">
-                <span class="form-label">Tên hành khách *</span>
-                <input type="text" name="tenhanhkhach" class="form-control" value="" required=""/>
-            </div>
-            <div class="form-floating mt-3 mb-3 col-md-8 justify-content-center" style="margin:auto">
-                <span class="form-label">Cccd *</span>
-                <input type="text" name="cccd" class="form-control" value="" required=""/>
+                {% for i in range(numberOfPeople) %}
+                <tr>
+                    <td class="col-md-5">Hành khách {{ i+1 }}</td>
+                    <td class="col-md-7">
+                        <div class="form-floating mb-3 mt-3 col-md-8" style="margin:auto">
+                            <span class="form-label">Tên hành khách *</span>
+                            <input type="text" name="tenhanhkhach_{{ i }}" class="form-control" value="" required=""/>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-7">
+                        <div class="form-floating mt-3 mb-3 col-md-8 justify-content-center" style="margin:auto">
+                            <span class="form-label">CCCD *</span>
+                            <input type="text" name="cccd_{{ i }}" class="form-control" value="" required=""/>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
             </div>
             <div class="form-floating mt-3 mb-3" style="margin:auto; width:10%">
                 <input type="submit" class="btn btn-danger" value="Thanh toán">
             </div>
             {% else %}
-            <p>Vui lòng <a href="/login?next=/flight-details?flight_id={{fl.id}}">đăng nhập</a> để xem đặt chuyến bay!</p>
+            <p>Vui lòng <a href="/login?next=/flight-details?flight_id={{fl.id}}&price={{price}}&numberOfPeople={{request.args.get('numberOfPeople')}}">đăng nhập</a> để xem đặt chuyến bay!
+            </p>
             {% endif %}
         </form>
         {% else %}

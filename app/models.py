@@ -26,7 +26,7 @@ class HangMayBay(BaseModel):
     chuyenbays = relationship('ChuyenBay', backref='hangmaybay', lazy=False)
 
     def __str__(self):
-        return self.ten
+        return str(self.ten)
 
 
 class SanBay(BaseModel):
@@ -36,7 +36,7 @@ class SanBay(BaseModel):
     sanbaydungs = relationship('SanBayDung', backref='sanbay', lazy=False)
     vitri = Column(String(50), nullable=False)
     def __str__(self):
-        return self.ten
+        return str(self.ten)
 
 
 class TuyenBay(BaseModel):
@@ -50,19 +50,20 @@ class TuyenBay(BaseModel):
     sanbayden = relationship("SanBay", foreign_keys=[sanbayden_ma])
 
     def __str__(self):
-        return self.ten
+        return str(self.ten)
 
 
 class ChuyenBay(BaseModel):
     __tablename__ = 'chuyenbay'
-
+    ten_cb = Column(String(50), nullable=False)
     giodi = Column(DateTime, nullable=False)
     thoigianbay = Column(Integer, nullable=False)
     hangmaybay_ma = Column(Integer, ForeignKey(HangMayBay.id), nullable=False)
     tuyenbay_ma = Column(Integer, ForeignKey(TuyenBay.id), nullable=False)
     sanbaydungs = relationship('SanBayDung', backref='chuyenbay', lazy=False)
     bangdongias = relationship('BangDonGia', backref='chuyenbay', lazy=True)
-
+    def __str__(self):
+        return str(self.ten_cb)
 
 class SanBayDung(BaseModel):
     __tablename__ = 'sanbaydung'
@@ -85,7 +86,7 @@ class NguoiDung(BaseModel, UserMixin):
     loainguoidung = Column(Enum(UserRole), default=UserRole.USER)
 
     def __str__(self):
-        return self.ten
+        return str(self.ten)
 
 
 class HangVe(BaseModel):
@@ -95,7 +96,7 @@ class HangVe(BaseModel):
     bangdongias = relationship('BangDonGia', backref='hangve', lazy=True)
 
     def __str__(self):
-        return self.ten
+        return str(self.ten)
 
 
 class BangDonGia(BaseModel):
@@ -111,77 +112,85 @@ class BangDonGia(BaseModel):
 class VeChuyenBay(BaseModel):
     __tablename__ = 'vechuyenbay'
 
-    tennguoidi = Column(String(50), nullable=False)
-    cccd = Column(String(20), nullable=False)
     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
     bangdongia_ma = Column(Integer, ForeignKey(BangDonGia.id), nullable=False)
     Ngaydat = Column(DateTime, default=datetime.now())
 
+    nguoidis = relationship('NguoiDi', back_populates='vechuyenbay')
+
+class NguoiDi(BaseModel):
+    __tablename__ = 'nguoidi'
+
+    vechuyenbay_id = Column(Integer, ForeignKey(VeChuyenBay.id), nullable=False)
+    tennguoidi = Column(String(50))
+    cccd = Column(String(20))
+
+    vechuyenbay = relationship('VeChuyenBay', back_populates='nguoidis')
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
-        v1 = HangVe(ten='Hạng 1')
-        v2 = HangVe(ten='Hạng 2')
-        db.session.add_all([v1, v2])
-        db.session.commit()
-
-        import hashlib
-
-        password = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
-        u1 = NguoiDung(ten='Hoang', taikhoan='admin', matkhau=password,phone='123456', cccd='392139213',passport='222', loainguoidung=UserRole.ADMIN,)
-        u2 = NguoiDung(ten='Hoang', taikhoan='staff', matkhau=password, phone='123456', cccd='321321321',
-                       passport='222', loainguoidung=UserRole.STAFF, )
-
-        u3 = NguoiDung(ten='ND1', taikhoan='user1', matkhau=password, phone='123256', cccd='3213212321',
-                       passport='22221', loainguoidung=UserRole.USER, )
-        db.session.add_all([u1, u2, u3])
-        db.session.commit()
-
-
-        #Hang may bay
-
-        c1 = HangMayBay(ma_hang='HVN',ten='Vietnam Airlines',
-                        gioithieu="Là một Hãng hàng không quốc gia có quy mô hoạt động toàn cầu và có tầm cỡ tại khu vực.Vietnam Airlines cam kết sẽ luôn đồng hành cùng các cổ đông, minh bạch công khai thông tin, duy trì và nâng cao các kênh đối thoại mở với cổ đông, tổ chức hoạt động kinh doanh an toàn, chất lượng và có hiệu quả trên cơ sở cân đối hài hòa lợi ích của cổ đông với việc đáp ứng nhu cầu phát triển kinh tế của đất nước.",
-                        hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997776/T%C6%B0_v%E1%BA%A5n_ajewn9.jpg")
-        c2 = HangMayBay(ma_hang='BAV', ten='Bamboo Airwayss',
-                        gioithieu="Là hãng hàng không tư nhân đầu tiên tại Việt Nam xác định theo đuổi mục tiêu cung cấp dịch vụ hàng không định hướng chuẩn quốc tế. Trên hành trình sải cánh vươn xa, chiến lược cốt lõi của Bamboo Airways là kết nối các vùng đất tiềm năng, góp phần quảng bá sâu rộng và hiệu quả giá trị tốt đẹp của văn hoá, con người Việt Nam tới bạn bè thế giới.",
-                        hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997776/Bamboo_Airways_khai_th%C3%A1c_an_to%C3%A0n_1_000_chuy%E1%BA%BFn_bay_trong_5_tu%E1%BA%A7n_t%C3%ADnh_t%C4%83ng_l%C3%AAn_100_chuy%E1%BA%BFn_ng%C3%A0y_a0ifja.jpg")
-        c3 = HangMayBay(ma_hang='VJC',ten='Vietjet Air',
-                        gioithieu="Là hãng hàng không đầu tiên tại Việt Nam vận hành theo mô hình hàng không thế hệ mới, chi phí thấp và cung cấp đa dạng các dịch vụ cho khách hàng lựa chọn. Hãng không chỉ vận chuyển hàng không mà còn cung cấp các nhu cầu tiêu dùng hàng hoá và dịch vụ cho khách hàng thông qua các ứng dụng công nghệ thương mại điện tử tiên tiến.",
-                        hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997775/Airbus_A321XLR_pour_VietJet_A350-900_pour_South_African_Airways___Air_Journal_cblehe.jpg")
-        c4 = HangMayBay(ma_hang='PIC',ten='Pacific Airlines',
-                        gioithieu="Hãng hàng không Pacific Airlines được biết tới là hàng hàng không đi tiên phong trong mảng vé máy bay giá rẻ tại Việt Nam. Mục tiêu hoạt động là đem đến những tấm vé máy bay giá rẻ tới tận tay người tiêu dung hàng ngày. Có thể nói Pacific Airlines Là một bước ngoặc lớn trong ngành hàng không vận chuyển và trong thời đại kinh tế thị trường đầy biến động hiện nay.",
-                        hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669998060/Web_maybay_zikhqo.jpg")
-        c5 = HangMayBay(ma_hang='JQ', ten='Jetstar',
-                        gioithieu="Có thể, bạn biết đến chúng tôi như hãng hàng không nổi tiếng về cung cấp giá vé rẻ. Nhưng bạn có biết rằng mỗi tuần chúng tôi thực hiện hơn 5,000 chuyến bay đến hơn 85 điểm đến hay chúng tôi đã giúp quyên góp được hơn 10 triệu đô la Úc. Bạn có thể theo các liên kết tại đây để tìm hiểu triết lý kinh doanh của chúng tôi, về đội bay đầy ấn tượng của chúng tôi và các cơ hội để BẠN có thể đến với Jetstar.",
-                        hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669998050/a321_neo_ugtnjh.jpg")
-        db.session.add_all([c1, c2, c3, c4, c5])
-        db.session.commit()
-
-
-        #sân bay
-        sb1 = SanBay(masanbay="BMV", ten="Sân bay Buôn Ma Thuột", vitri="Đắk Lắk")
-        sb2 = SanBay(masanbay="DAD", ten="Sân bay quốc tế Đà Nẵng", vitri="Đà Nẵng")
-        sb3 = SanBay(masanbay="HAN", ten="Sân bay quốc tế Nội Bài", vitri="Hà Nội")
-        sb4 = SanBay(masanbay="SGN", ten="Sân bay quốc tế Tân Sơn Nhất", vitri="Thành phố Hồ Chí Minh")
-        sb5 = SanBay(masanbay="CXR", ten="Sân bay quốc tế Cam Ranh", vitri="Khánh Hòa")
-        sb6 = SanBay(masanbay="PQC", ten="Sân bay quốc tế Phú Quốc", vitri="Kiên Giang")
-        sb7 = SanBay(masanbay="NGO", ten="Sân bay quốc tế Chubu", vitri="Nagoya")
-        sb8 = SanBay(masanbay="ICN", ten="Sân bay quốc tế Incheon", vitri="Hàn Quốc")
-        sb9 = SanBay(masanbay="LAX", ten="Sân bay quốc tế Los Angeles", vitri="Los Angeles")
-        sb10 = SanBay(masanbay="MVD", ten="Sân bay quốc tế Carrasco", vitri="Montevideo")
-        db.session.add_all([sb1, sb2, sb3, sb4, sb5, sb6, sb7, sb8, sb9, sb10])
-        db.session.commit()
-
-        t1 = TuyenBay(ten="Buôn Ma Thuột - Đà Nẵng", sanbaydi_ma=1, sanbayden_ma=2)
-        t2 = TuyenBay(ten="Hà Nội - Sài Gòn ", sanbaydi_ma=3, sanbayden_ma=4)
-        t3 = TuyenBay(ten="Sài Gòn - LOS ", sanbaydi_ma=4, sanbayden_ma=9)
-
-        db.session.add_all([t1, t2, t3])
-        db.session.commit()
-
+        #
+        # v1 = HangVe(ten='Hạng 1')
+        # v2 = HangVe(ten='Hạng 2')
+        # db.session.add_all([v1, v2])
+        # db.session.commit()
+        #
+        # import hashlib
+        #
+        # password = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        # u1 = NguoiDung(ten='Hoang', taikhoan='admin', matkhau=password,phone='123456', cccd='392139213',passport='222', loainguoidung=UserRole.ADMIN,)
+        # u2 = NguoiDung(ten='Hoang', taikhoan='staff', matkhau=password, phone='123456', cccd='321321321',
+        #                passport='222', loainguoidung=UserRole.STAFF, )
+        #
+        # u3 = NguoiDung(ten='ND1', taikhoan='user1', matkhau=password, phone='123256', cccd='3213212321',
+        #                passport='22221', loainguoidung=UserRole.USER, )
+        # db.session.add_all([u1, u2, u3])
+        # db.session.commit()
+        #
+        #
+        # #Hang may bay
+        #
+        # c1 = HangMayBay(ma_hang='HVN',ten='Vietnam Airlines',
+        #                 gioithieu="Là một Hãng hàng không quốc gia có quy mô hoạt động toàn cầu và có tầm cỡ tại khu vực.Vietnam Airlines cam kết sẽ luôn đồng hành cùng các cổ đông, minh bạch công khai thông tin, duy trì và nâng cao các kênh đối thoại mở với cổ đông, tổ chức hoạt động kinh doanh an toàn, chất lượng và có hiệu quả trên cơ sở cân đối hài hòa lợi ích của cổ đông với việc đáp ứng nhu cầu phát triển kinh tế của đất nước.",
+        #                 hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997776/T%C6%B0_v%E1%BA%A5n_ajewn9.jpg")
+        # c2 = HangMayBay(ma_hang='BAV', ten='Bamboo Airwayss',
+        #                 gioithieu="Là hãng hàng không tư nhân đầu tiên tại Việt Nam xác định theo đuổi mục tiêu cung cấp dịch vụ hàng không định hướng chuẩn quốc tế. Trên hành trình sải cánh vươn xa, chiến lược cốt lõi của Bamboo Airways là kết nối các vùng đất tiềm năng, góp phần quảng bá sâu rộng và hiệu quả giá trị tốt đẹp của văn hoá, con người Việt Nam tới bạn bè thế giới.",
+        #                 hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997776/Bamboo_Airways_khai_th%C3%A1c_an_to%C3%A0n_1_000_chuy%E1%BA%BFn_bay_trong_5_tu%E1%BA%A7n_t%C3%ADnh_t%C4%83ng_l%C3%AAn_100_chuy%E1%BA%BFn_ng%C3%A0y_a0ifja.jpg")
+        # c3 = HangMayBay(ma_hang='VJC',ten='Vietjet Air',
+        #                 gioithieu="Là hãng hàng không đầu tiên tại Việt Nam vận hành theo mô hình hàng không thế hệ mới, chi phí thấp và cung cấp đa dạng các dịch vụ cho khách hàng lựa chọn. Hãng không chỉ vận chuyển hàng không mà còn cung cấp các nhu cầu tiêu dùng hàng hoá và dịch vụ cho khách hàng thông qua các ứng dụng công nghệ thương mại điện tử tiên tiến.",
+        #                 hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669997775/Airbus_A321XLR_pour_VietJet_A350-900_pour_South_African_Airways___Air_Journal_cblehe.jpg")
+        # c4 = HangMayBay(ma_hang='PIC',ten='Pacific Airlines',
+        #                 gioithieu="Hãng hàng không Pacific Airlines được biết tới là hàng hàng không đi tiên phong trong mảng vé máy bay giá rẻ tại Việt Nam. Mục tiêu hoạt động là đem đến những tấm vé máy bay giá rẻ tới tận tay người tiêu dung hàng ngày. Có thể nói Pacific Airlines Là một bước ngoặc lớn trong ngành hàng không vận chuyển và trong thời đại kinh tế thị trường đầy biến động hiện nay.",
+        #                 hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669998060/Web_maybay_zikhqo.jpg")
+        # c5 = HangMayBay(ma_hang='JQ', ten='Jetstar',
+        #                 gioithieu="Có thể, bạn biết đến chúng tôi như hãng hàng không nổi tiếng về cung cấp giá vé rẻ. Nhưng bạn có biết rằng mỗi tuần chúng tôi thực hiện hơn 5,000 chuyến bay đến hơn 85 điểm đến hay chúng tôi đã giúp quyên góp được hơn 10 triệu đô la Úc. Bạn có thể theo các liên kết tại đây để tìm hiểu triết lý kinh doanh của chúng tôi, về đội bay đầy ấn tượng của chúng tôi và các cơ hội để BẠN có thể đến với Jetstar.",
+        #                 hinhanh="https://res.cloudinary.com/dfzvtpwsd/image/upload/v1669998050/a321_neo_ugtnjh.jpg")
+        # db.session.add_all([c1, c2, c3, c4, c5])
+        # db.session.commit()
+        #
+        #
+        # #sân bay
+        # sb1 = SanBay(masanbay="BMV", ten="Sân bay Buôn Ma Thuột", vitri="Đắk Lắk")
+        # sb2 = SanBay(masanbay="DAD", ten="Sân bay quốc tế Đà Nẵng", vitri="Đà Nẵng")
+        # sb3 = SanBay(masanbay="HAN", ten="Sân bay quốc tế Nội Bài", vitri="Hà Nội")
+        # sb4 = SanBay(masanbay="SGN", ten="Sân bay quốc tế Tân Sơn Nhất", vitri="Thành phố Hồ Chí Minh")
+        # sb5 = SanBay(masanbay="CXR", ten="Sân bay quốc tế Cam Ranh", vitri="Khánh Hòa")
+        # sb6 = SanBay(masanbay="PQC", ten="Sân bay quốc tế Phú Quốc", vitri="Kiên Giang")
+        # sb7 = SanBay(masanbay="NGO", ten="Sân bay quốc tế Chubu", vitri="Nagoya")
+        # sb8 = SanBay(masanbay="ICN", ten="Sân bay quốc tế Incheon", vitri="Hàn Quốc")
+        # sb9 = SanBay(masanbay="LAX", ten="Sân bay quốc tế Los Angeles", vitri="Los Angeles")
+        # sb10 = SanBay(masanbay="MVD", ten="Sân bay quốc tế Carrasco", vitri="Montevideo")
+        # db.session.add_all([sb1, sb2, sb3, sb4, sb5, sb6, sb7, sb8, sb9, sb10])
+        # db.session.commit()
+        #
+        # t1 = TuyenBay(ten="Buôn Ma Thuột - Đà Nẵng", sanbaydi_ma=1, sanbayden_ma=2)
+        # t2 = TuyenBay(ten="Hà Nội - Sài Gòn ", sanbaydi_ma=3, sanbayden_ma=4)
+        # t3 = TuyenBay(ten="Sài Gòn - LOS ", sanbaydi_ma=4, sanbayden_ma=9)
+        #
+        # db.session.add_all([t1, t2, t3])
+        # db.session.commit()
+        #
 
 
         # b1 = BangDonGia(hangve_ma=1, chuyenbay_ma=1, gia=1000000, soghe=20)
