@@ -1,105 +1,45 @@
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}"/>
-{% endblock %}
+{% extends 'layout/base.html' %}
 
-<div id="booking" class="section">
-    <div class="section-center">
-        <div class="container">
-            <div class="row">
-                <div class="booking-form">
-                    <form action="{{ url_for('flights')}}">
-                        {% if b %}
-                            <div class="row justify-content-center d-none">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <input class="form-control text-center" type="text" id="airline" name="airline" value="{{b.id}}"/>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4" style="font-weight: 600; text-shadow: 3px 3px 5px grey; color: #394353">Đăng kí người dùng</h1>
 
-                        <div class="row justify-content-center">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <span class="form-label">Điểm đi</span>
-                                    <input class="form-control" type="text" id="airport1" name="airport1" list="datalistOptions" placeholder="Nhập sân bay đi" required=""/>
-                                    <datalist id="datalistOptions">
-                                        {% for airport in airports %}
-                                            <option value="{{ airport.ten }}">
-                                        {% endfor %}
-                                    </datalist>
-                                </div>
-                            </div>
-
-                            <div class="col-md-1">
-                                <button type="button" id="swapAirports" class="btn btn-primary btn-block">Xoay</button>
-                            </div>
-
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <span class="form-label">Điểm đến</span>
-                                    <input class="form-control" type="text" id="airport2" name="airport2" list="datalistOptions2" placeholder="Nhập sân bay đến" required=""/>
-                                    <datalist id="datalistOptions2">
-                                        {% for airport in airports %}
-                                            <option value="{{ airport.ten }}">
-                                        {% endfor %}
-                                    </datalist>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row justify-content-center">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <span class="form-label">Ngày đi</span>
-                                    <input class="form-control" type="date" id="datetime" name="departuretime" required=""/>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3" id="returnDateField">
-                                <div class="form-group">
-                                    <label class="form-check-label">
-                                        <input type="checkbox" id="roundTripCheckbox" class="form-check-input">
-                                        Khứ hồi
-                                    </label>
-                                    <input class="form-control"
-                                           type="date"
-                                           id="returnDatetime"
-                                           name="returnDatetime" disabled/>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3">
-                                <div class="form-btn">
-                                    <input type="submit" value="Tìm" class="submit-btn"/>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    {% if err_msg %}
+    <div class="alert alert-danger">
+        {{ err_msg }}
     </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" action="/register">
+        <div class="form-floating mb-3 mt-3">
+            <input type="text" class="form-control" required id="name" placeholder="Nhập họ tên" name="name">
+            <label for="name">Họ tên</label>
+        </div>
+
+        <div class="form-floating mb-3 mt-3">
+            <input type="text" class="form-control" required id="username" placeholder="Nhập tên đăng nhập" name="username">
+            <label for="username">Tên đăng nhập</label>
+        </div>
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="password" class="form-control" required id="pwd" placeholder="Nhập mật khẩu" name="password">
+            <label for="pwd">Mật khẩu</label>
+        </div>
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="password" class="form-control" id="confirm" required placeholder="Nhập xác nhận mật khẩu"
+                   name="confirm">
+            <label for="confirm">Xác nhận mật khẩu</label>
+        </div>
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="file" class="form-control" id="avatar" required name="avatar">
+            <label for="avatar">Ảnh đại diện</label>
+        </div>
+
+        <div class="form-floating mt-3 mb-3">
+            <input type="submit" class="btn btn-danger" value="Đăng ký">
+        </div>
+    </form>
 </div>
-
-<script>
-    // Add JavaScript to swap airport values when the button is clicked
-    var swapAirportsButton = document.getElementById('swapAirports');
-    var airport1Input = document.getElementById('airport1');
-    var airport2Input = document.getElementById('airport2');
-
-    swapAirportsButton.addEventListener('click', function () {
-        var temp = airport1Input.value;
-        airport1Input.value = airport2Input.value;
-        airport2Input.value = temp;
-    });
-
-    // Add JavaScript to show/hide the return date field based on the checkbox state
-    var roundTripCheckbox = document.getElementById('roundTripCheckbox');
-    var returnDateField = document.getElementById('returnDateField');
-    var returnDatetime = document.getElementById('returnDatetime');
-
-    roundTripCheckbox.addEventListener('change', function () {
-        returnDatetime.disabled = !roundTripCheckbox.checked;
-    });
-</script>
+{% endblock %}

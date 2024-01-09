@@ -33,7 +33,7 @@
                 {% if current_user.is_authenticated %}
                 <div>
                     <span class="text-danger fst-italic fw-bolder">Chào {{ current_user.ten }}!</span>
-                    <img width="40" class="rounded-circle" src="{{ current_user.anhdaidien }}" alt="{{ current_user.ten }}" />
+                  <img width="40" class="rounded-circle" src="{{ current_user.anhdaidien }}" alt="{{ current_user.ten }}" />
                     <a class="btn btn-outline-primary me-2" href="{{ url_for('logout') }}">Đăng Xuất</a>
                 </li>
                 {% else %}

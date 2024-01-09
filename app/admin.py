@@ -1,12 +1,20 @@
 from flask import redirect, request
-from app import admin, db, dao
+from app import db, dao, app
 from app.models import HangMayBay, SanBay, TuyenBay, ChuyenBay, SanBayDung, BangDonGia, NguoiDung, HangVe, VeChuyenBay, \
     UserRole
 from flask_admin.contrib.sqla import ModelView
-from flask_admin import BaseView, expose
+from flask_admin import BaseView, expose, Admin, AdminIndexView
 from flask_login import logout_user, current_user
+from wtforms import ValidationError
 
 
+
+
+# class MyAdmin(AdminIndexView):
+#     @expose('/')
+#     def index(self):
+#         return self.render('admin/index.html', stats=dao.flightroute_stats() )
+admin = Admin(app=app, name='QUẢN TRỊ', template_mode='bootstrap4')
 class AuthenticatedModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.loainguoidung == UserRole.ADMIN
@@ -35,11 +43,11 @@ class LogoutView(Authenticated2View):
         return redirect('/admin')
 
 
-class StatsView(AuthenticatedView):
-    @expose('/')
-    def index(self):
-        stats = dao.flightroute_stats(from_date=request.args.get('from_date'), to_date=request.args.get('to_date'))
-        return self.render('admin/stats.html', stats=stats)
+# class StatsView(AuthenticatedView):
+#     @expose('/')
+#     def index(self):
+#         stats = dao.flightroute_stats(from_date=request.args.get('from_date'), to_date=request.args.get('to_date'))
+#         return self.render('admin/stats.html', stats=stats)
 
 
 class HangMayBayModelView(AuthenticatedModelView):
@@ -73,11 +81,23 @@ class TuyenBayModelView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
     column_labels = {
+        'chuyenbays': 'Chuyến bay',
         'ten': 'Tên tuyến bay',
         'sanbaydi': 'Sân bay đi',
         'sanbayden': 'Sân bay đến',
     }
     page_size = 10
+
+    #hàm kiểm tra thay đổi trong form và gọi hàm check_same_airport
+    def on_model_change(self, form, model, is_created):
+
+        self.check_same_airport(model.sanbaydi, model.sanbayden)
+    #hàm check trùng sân bay
+    def check_same_airport(self, sanbaydi, sanbayden):
+
+        if sanbaydi == sanbayden:
+            raise ValidationError('trùng sân bay vui lòng chọn lại')
+
 
 
 class ChuyenBayModelView(Authenticated2ModelView):
@@ -89,9 +109,14 @@ class ChuyenBayModelView(Authenticated2ModelView):
         'thoigianbay': 'Thời gian bay',
         'hangmaybay': 'Hãng máy bay',
         'tuyenbay': 'Tuyến bay',
+        'bangdongias': "đơn giá"
     }
     page_size = 10
-
+    form_columns = ('giodi', 'thoigianbay', 'hangmaybay', 'tuyenbay','bangdongias')
+    def on_model_change(self, form, model, is_created):
+        if model.thoigianbay < 30:
+            raise ValidationError('Thời gian bay tối thiểu là 30 phút')
+        return super(ChuyenBayModelView, self).on_model_change(form, model, is_created)
 
 
 class SanBayDungModelView(AuthenticatedModelView):
@@ -104,6 +129,11 @@ class SanBayDungModelView(AuthenticatedModelView):
         'chuyenbay': 'Chuyến bay',
     }
     page_size = 10
+
+    def on_model_change(self, form, model, is_created):
+        if (model.thoigiandung < 20) or model.thoigiandung >30:
+            raise ValidationError('Thời gian bay dừng phải trong khoảng từ 20 đến 30 phút')
+        return super(SanBayDungModelView, self).on_model_change(form, model, is_created)
 
 
 class ChiTietChuyenBayModelView(AuthenticatedModelView):
@@ -118,6 +148,13 @@ class ChiTietChuyenBayModelView(AuthenticatedModelView):
 
     }
     page_size = 10
+    form_columns = ('gia', 'soghe', 'chuyenbay', 'hangve')
+    def on_model_change(self, form, model, is_created):
+        if model.soghe < 0:
+            raise ValidationError('số ghế phải lớn hơn 0')
+
+        return super(ChiTietChuyenBayModelView, self).on_model_change(form, model, is_created)
+
 
 class HangVeModelView(AuthenticatedModelView):
     can_export = True
@@ -168,7 +205,7 @@ admin.add_view(ChiTietChuyenBayModelView(BangDonGia, db.session, name='Chi tiế
 admin.add_view(HangVeModelView(HangVe, db.session, name='Hạng vé'))
 admin.add_view(NguoiDungModelView(NguoiDung, db.session, name='Người dùng'))
 admin.add_view(VeChuyenBayModelView(VeChuyenBay, db.session, name='Vé'))
-admin.add_view(StatsView(name='BC-TK'))
+# admin.add_view(StatsView(name='BC-TK'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
 

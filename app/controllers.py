@@ -2,7 +2,7 @@ from flask import render_template, request, redirect
 from flask_login import login_user, logout_user
 from app import dao
 from datetime import timedelta, datetime
-# import cloudinary.uploader
+import cloudinary.uploader
 
 
 def index():
@@ -78,14 +78,14 @@ def register():
 
         if password.__eq__(confirm):
             avatar = ''
-            # if request.files:
-            #     res = cloudinary.uploader.upload(request.files['avatar'])
-            #     avatar = res['secure_url']
+            if request.files:
+                res = cloudinary.uploader.upload(request.files['avatar'])
+                avatar = res['secure_url']
             try:
                 dao.register(name=request.form['name'],
                              username=request.form['username'],
                              password=request.form['password'],
-                             avatar=avatar)
+                            )
 
                 return redirect('/login')
 

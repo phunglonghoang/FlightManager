@@ -60,7 +60,7 @@ class ChuyenBay(BaseModel):
     hangmaybay_ma = Column(Integer, ForeignKey(HangMayBay.id), nullable=False)
     tuyenbay_ma = Column(Integer, ForeignKey(TuyenBay.id), nullable=False)
     sanbaydungs = relationship('SanBayDung', backref='chuyenbay', lazy=False)
-    bangdongias = relationship('BangDonGia', backref='chuyenbay', lazy=True)
+    bangdongias = relationship('BangDonGia', backref='chuyenbay', lazy=False)
 
     def __str__(self):
         return str(self.ten_cb)
@@ -85,6 +85,7 @@ class NguoiDung(BaseModel, UserMixin):
     passport = Column(String(20), nullable=False)
     hoatdong = Column(Boolean, default=True)
     loainguoidung = Column(Enum(UserRole), default=UserRole.USER)
+    anhdaidien = Column(String(100), nullable=False)
 
     def __str__(self):
         return str(self.ten)
@@ -119,6 +120,31 @@ class VeChuyenBay(BaseModel):
     bangdongia_ma = Column(Integer, ForeignKey(BangDonGia.id), nullable=False)
     Ngaydat = Column(DateTime, default=datetime.now())
 
+# class HoaDon(BaseModel):
+#     __tablename__ = 'hoadon'
+#
+#     ngayxuat = Column(DateTime, default=datetime.now(), nullable=False)
+#     tongtien = Column(Float, nullable=False)
+#     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
+#     vechuyenbay_ma = Column(Integer, ForeignKey(VeChuyenBay.id), nullable=False)
+#     nguoidung = relationship("NguoiDung", backref="hoadons")
+#     vechuyenbay = relationship("VeChuyenBay", backref="hoadons")
+#
+#     def __str__(self):
+#         return f"HoaDon {self.id}"
+#
+#
+# class History(BaseModel):
+#     __tablename__ = 'history'
+#
+#     nguoidung_ma = Column(Integer, ForeignKey(NguoiDung.id), nullable=False)
+#     chuyenbay_ma = Column(Integer, ForeignKey(ChuyenBay.id), nullable=False)
+#     ngaydat = Column(DateTime, default=datetime.now(), nullable=False)
+#     nguoidung = relationship("NguoiDung", backref="histories")
+#     chuyenbay = relationship("ChuyenBay", backref="histories")
+#
+#     def __str__(self):
+#         return f"History {self.id} - User {self.nguoidung_ma}"
 
 if __name__ == '__main__':
     with app.app_context():
@@ -184,15 +210,15 @@ if __name__ == '__main__':
         # db.session.add_all([t1, t2, t3])
         # db.session.commit()
         # #chuyến bay
-        cb1 = ChuyenBay(ten_cb ="BMT- ĐN", giodi=datetime.strptime('01/10/24 02:55:00', '%m/%d/%y %H:%M:%S'), thoigianbay=90,
-                       hangmaybay_ma=1, tuyenbay_ma=1)
-        db.session.add_all([cb1])
-        db.session.commit()
+        # cb1 = ChuyenBay(ten_cb ="BMT- ĐN", giodi=datetime.strptime('01/10/24 02:55:00', '%m/%d/%y %H:%M:%S'), thoigianbay=90,
+        #                hangmaybay_ma=1, tuyenbay_ma=1)
+        # db.session.add_all([cb1])
+        # db.session.commit()
         # #
         #
         #
-        # b1 = BangDonGia(hangve_ma=1, chuyenbay_ma=1, gia=1000000, soghe=20)
-        # b2 = BangDonGia(hangve_ma=2, chuyenbay_ma=1, gia=900000, soghe=15)
+        b1 = BangDonGia(hangve_ma=1, chuyenbay_ma=1, gia=1000000, soghe=20)
+        b2 = BangDonGia(hangve_ma=2, chuyenbay_ma=1, gia=900000, soghe=15)
         # b3 = BangDonGia(hangve_ma=1, chuyenbay_ma=2, gia=800000, soghe=50)
         # b4 = BangDonGia(hangve_ma=1, chuyenbay_ma=3, gia=1300000, soghe=30)
         # b5 = BangDonGia(hangve_ma=2, chuyenbay_ma=3, gia=1000000, soghe=20)
