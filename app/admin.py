@@ -224,6 +224,7 @@ class VeChuyenBayModelView(Authenticated2ModelView):
         'Ngaydat': 'Ngày đặt vé',
         'nguoidung_ma': 'Mã Người dùng',
         'bangdongia': 'Gia'
+
     }
 
     page_size = 10
